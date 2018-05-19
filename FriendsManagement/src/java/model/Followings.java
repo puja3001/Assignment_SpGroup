@@ -32,6 +32,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Followings.findAll", query = "SELECT f FROM Followings f"),
+    @NamedQuery(name = "Followings.findByFUsername", query = "SELECT f FROM Followings f WHERE f.fusername = :username"),
+    @NamedQuery(name = "Followings.findByUsername", query = "SELECT f FROM Followings f WHERE f.username = :username"),
+    @NamedQuery(name = "Followings.findByUsers", query = "SELECT f FROM Followings f WHERE f.username = :username AND f.fusername = :fusername"),
     @NamedQuery(name = "Followings.findByFollowingId", query = "SELECT f FROM Followings f WHERE f.followingId = :followingId"),
     @NamedQuery(name = "Followings.findByDatecreated", query = "SELECT f FROM Followings f WHERE f.datecreated = :datecreated")})
 public class Followings implements Serializable {
@@ -42,6 +45,10 @@ public class Followings implements Serializable {
     @Basic(optional = false)
     @Column(name = "following_id")
     private Integer followingId;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "fstatus")
+    private String fstatus;
     @Basic(optional = false)
     @NotNull
     @Column(name = "datecreated")
@@ -72,6 +79,14 @@ public class Followings implements Serializable {
 
     public void setFollowingId(Integer followingId) {
         this.followingId = followingId;
+    }
+    
+    public void setFStatus(String fstatus){
+        this.fstatus = fstatus;
+    }
+    
+    public String getFStatus(){
+        return fstatus;
     }
 
     public Date getDatecreated() {

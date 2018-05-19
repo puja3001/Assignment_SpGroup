@@ -31,7 +31,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Relationships.findByUserone", query = "SELECT r FROM Relationships r WHERE r.relationshipsPK.userone = :userone"),
     @NamedQuery(name = "Relationships.findByUsertwo", query = "SELECT r FROM Relationships r WHERE r.relationshipsPK.usertwo = :usertwo"),
     @NamedQuery(name = "Relationships.findByStatus", query = "SELECT r FROM Relationships r WHERE r.status = :status")})
-    //@NamedQuery(name = "Relationships.findCommonFriends", query = "SELECT rel1 from (SELECT r1 from Relationships r1 where r1.users = :userone ) rel1 INNER JOIN (select r2 from Relationships r2 where r2.users = :usertwo ) rel2 ON rel1.user1 = rel2.users1")})
 public class Relationships implements Serializable {
 
     private static final long serialVersionUID = 1L;

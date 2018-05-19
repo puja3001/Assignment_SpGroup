@@ -7,7 +7,6 @@ package business;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -31,11 +30,17 @@ public class UserBean {
     
     public ArrayList<String> getAllUsers(String email){
         Users user = em.find(Users.class, email);
-        Collection<Relationships> relationships = user.getRelationshipsCollection();
-        ArrayList<String> friends = new ArrayList<String>();
-        relationships.stream().forEach((relation) -> {
+        Collection<Relationships> relationships1 = user.getRelationshipsCollection();
+        Collection<Relationships> relationships2 = user.getRelationshipsCollection1();
+        ArrayList<String> friends = new ArrayList<>();
+        relationships1.stream().forEach((relation) -> {
             if(relation.getStatus().equals("friends")){
                 friends.add(relation.getUsers1().getEmail());
+            }
+         });
+        relationships2.stream().forEach((relation) -> {
+            if(relation.getStatus().equals("friends")){
+                friends.add(relation.getUsers().getEmail());
             }
          });
         return friends;

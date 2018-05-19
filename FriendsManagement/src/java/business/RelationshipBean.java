@@ -5,12 +5,9 @@
  */
 package business;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import model.Relationships;
 import model.RelationshipsPK;
 import model.Users;
@@ -39,31 +36,22 @@ public class RelationshipBean {
         return em.merge(relation);
     }
     
+    public void updateRelation(Relationships relation){
+        em.merge(relation);
+    }
+    
     public Relationships findRelation(Users userone, Users usertwo){
         RelationshipsPK relationPK = new RelationshipsPK();
         relationPK.setUserone(userone.getEmail());
         relationPK.setUsertwo(usertwo.getEmail());
         Relationships relation = em.find(Relationships.class, relationPK);
+        if(relation == null){
+            relationPK.setUsertwo(userone.getEmail());
+            relationPK.setUserone(usertwo.getEmail());
+            relation = em.find(Relationships.class, relationPK); 
+        }
+
         return relation;
-    }
-    
-    public List<Relationships> findRelationByUser(Users user){
-        TypedQuery<Relationships> query = em.createNamedQuery("Relationships.findByUsertwo", Relationships.class);
-        List<Relationships> relations = query.getResultList();
-        return relations;
-    }
-    
-    public ArrayList<String> findCommonFriends(Users userone, Users usertwo){
-       String query_string = "SELECT rel1 from (SELECT r1 from Relationships r1 where r1.users = :userone ) rel1 INNER JOIN (select r2 from Relationships r2 where r2.users = :usertwo ) rel2 ON rel1.user1 = rel2.users1";
-       TypedQuery<Relationships> query = em.createQuery(query_string, Relationships.class);
-       query.setParameter("userone", userone);
-       query.setParameter("usertwo", usertwo);
-       List<Relationships> result = query.getResultList();
-       ArrayList<String> common_friends = new ArrayList<String>();
-       result.stream().forEach((relation) -> {
-          common_friends.add(relation.getUsers1().getEmail());
-       });
-    return common_friends;
     }
     
 }
