@@ -8,10 +8,8 @@ package model;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -30,53 +28,48 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Relationships.findAll", query = "SELECT r FROM Relationships r"),
-    @NamedQuery(name = "Relationships.findByRelationshipId", query = "SELECT r FROM Relationships r WHERE r.relationshipId = :relationshipId"),
-    @NamedQuery(name = "Relationships.findByStatus", query = "SELECT r FROM Relationships r WHERE r.status = :status"),
-    @NamedQuery(name = "Relationships.findByActionuser", query = "SELECT r FROM Relationships r WHERE r.actionuser = :actionuser")})
+    @NamedQuery(name = "Relationships.findByUserone", query = "SELECT r FROM Relationships r WHERE r.relationshipsPK.userone = :userone"),
+    @NamedQuery(name = "Relationships.findByUsertwo", query = "SELECT r FROM Relationships r WHERE r.relationshipsPK.usertwo = :usertwo"),
+    @NamedQuery(name = "Relationships.findByStatus", query = "SELECT r FROM Relationships r WHERE r.status = :status")})
 public class Relationships implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "relationship_id")
-    private Integer relationshipId;
+    @EmbeddedId
+    protected RelationshipsPK relationshipsPK;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 8)
     @Column(name = "status")
     private String status;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 128)
-    @Column(name = "actionuser")
-    private String actionuser;
-    @JoinColumn(name = "userone", referencedColumnName = "email")
+    @JoinColumn(name = "userone", referencedColumnName = "email", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Users userone;
-    @JoinColumn(name = "usertwo", referencedColumnName = "email")
+    private Users users;
+    @JoinColumn(name = "usertwo", referencedColumnName = "email", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Users usertwo;
+    private Users users1;
 
     public Relationships() {
     }
 
-    public Relationships(Integer relationshipId) {
-        this.relationshipId = relationshipId;
+    public Relationships(RelationshipsPK relationshipsPK) {
+        this.relationshipsPK = relationshipsPK;
     }
 
-    public Relationships(Integer relationshipId, String status, String actionuser) {
-        this.relationshipId = relationshipId;
+    public Relationships(RelationshipsPK relationshipsPK, String status) {
+        this.relationshipsPK = relationshipsPK;
         this.status = status;
-        this.actionuser = actionuser;
     }
 
-    public Integer getRelationshipId() {
-        return relationshipId;
+    public Relationships(String userone, String usertwo) {
+        this.relationshipsPK = new RelationshipsPK(userone, usertwo);
     }
 
-    public void setRelationshipId(Integer relationshipId) {
-        this.relationshipId = relationshipId;
+    public RelationshipsPK getRelationshipsPK() {
+        return relationshipsPK;
+    }
+
+    public void setRelationshipsPK(RelationshipsPK relationshipsPK) {
+        this.relationshipsPK = relationshipsPK;
     }
 
     public String getStatus() {
@@ -87,34 +80,26 @@ public class Relationships implements Serializable {
         this.status = status;
     }
 
-    public String getActionuser() {
-        return actionuser;
+    public Users getUsers() {
+        return users;
     }
 
-    public void setActionuser(String actionuser) {
-        this.actionuser = actionuser;
+    public void setUsers(Users users) {
+        this.users = users;
     }
 
-    public Users getUserone() {
-        return userone;
+    public Users getUsers1() {
+        return users1;
     }
 
-    public void setUserone(Users userone) {
-        this.userone = userone;
-    }
-
-    public Users getUsertwo() {
-        return usertwo;
-    }
-
-    public void setUsertwo(Users usertwo) {
-        this.usertwo = usertwo;
+    public void setUsers1(Users users1) {
+        this.users1 = users1;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (relationshipId != null ? relationshipId.hashCode() : 0);
+        hash += (relationshipsPK != null ? relationshipsPK.hashCode() : 0);
         return hash;
     }
 
@@ -125,7 +110,7 @@ public class Relationships implements Serializable {
             return false;
         }
         Relationships other = (Relationships) object;
-        if ((this.relationshipId == null && other.relationshipId != null) || (this.relationshipId != null && !this.relationshipId.equals(other.relationshipId))) {
+        if ((this.relationshipsPK == null && other.relationshipsPK != null) || (this.relationshipsPK != null && !this.relationshipsPK.equals(other.relationshipsPK))) {
             return false;
         }
         return true;
@@ -133,7 +118,7 @@ public class Relationships implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Relationships[ relationshipId=" + relationshipId + " ]";
+        return "model.Relationships[ relationshipsPK=" + relationshipsPK + " ]";
     }
     
 }

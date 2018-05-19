@@ -65,9 +65,9 @@ public class Users implements Serializable {
     @Size(max = 128)
     @Column(name = "country")
     private String country;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userone")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "users")
     private Collection<Relationships> relationshipsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usertwo")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "users1")
     private Collection<Relationships> relationshipsCollection1;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "fusername")
     private Collection<Followings> followingsCollection;

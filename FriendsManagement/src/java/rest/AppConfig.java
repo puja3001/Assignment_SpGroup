@@ -10,9 +10,9 @@ import javax.ws.rs.core.Application;
 
 /**
  *
- * @author Vrinda
+ * @author agarwalpuja
  */
-@ApplicationPath("/api")
+@ApplicationPath("api")
 public class AppConfig extends Application {
       
 }
