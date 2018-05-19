@@ -47,6 +47,12 @@ public class RelationshipBean {
         return relation;
     }
     
+    public List<Relationships> findRelationByUser(Users user){
+        TypedQuery<Relationships> query = em.createNamedQuery("Relationships.findByUsertwo", Relationships.class);
+        List<Relationships> relations = query.getResultList();
+        return relations;
+    }
+    
     public ArrayList<String> findCommonFriends(Users userone, Users usertwo){
        String query_string = "SELECT rel1 from (SELECT r1 from Relationships r1 where r1.users = :userone ) rel1 INNER JOIN (select r2 from Relationships r2 where r2.users = :usertwo ) rel2 ON rel1.user1 = rel2.users1";
        TypedQuery<Relationships> query = em.createQuery(query_string, Relationships.class);

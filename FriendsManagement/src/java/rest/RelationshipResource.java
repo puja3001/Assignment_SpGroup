@@ -9,6 +9,9 @@ import business.Friend;
 import business.RelationshipBean;
 import business.UserBean;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.json.Json;
@@ -96,6 +99,46 @@ public class RelationshipResource {
         response.add("success","true");
         response.add("friends",friendsBuilder);
         response.add("count",common_friends.size());
+        return(Response.ok(response.build()).build());
+        
+    }
+    
+    @GET
+    @Path("retrieve")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    private Response retrieveUsers(String sender, String text){
+        Users user = userBean.findUser(sender);
+        
+        String pattern  = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher regexMatcher = regex.matcher(text);
+        String email_sub =  text.substring(regexMatcher.start(),regexMatcher.end());
+        
+        Users user_sub = userBean.findUser(email_sub);
+        if(user == null){
+          return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + sender).build();  
+        }
+        List<Relationships> relations = relationshipBean.findRelationByUser(user);
+        if(relations.isEmpty() && user_sub == null){
+            return Response.status(Response.Status.NO_CONTENT).entity("Given user has no valid subsribers").build(); 
+        }
+        JsonArrayBuilder subscribersBuilder = Json.createArrayBuilder();
+        relations.stream().forEach((p) -> {
+            if(p.getStatus() != "blocked"){
+                subscribersBuilder.add(p.getUsers().getEmail()); 
+            }
+         });
+        int count = relations.size();
+        if(user_sub != null){
+            subscribersBuilder.add(email_sub); 
+            count += 1;
+        }
+
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("success","true");
+        response.add("friends",subscribersBuilder);
+        response.add("count",count);
         return(Response.ok(response.build()).build());
         
     }
