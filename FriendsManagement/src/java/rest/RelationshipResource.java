@@ -71,43 +71,7 @@ public class RelationshipResource {
     @Path("common")
     @Consumes("application/json")
     @Produces(MediaType.APPLICATION_JSON)
-    private Response getCommonFriends(ArrayList<String> ids){
-        String email1 = ids.get(0);
-        String email2 = ids.get(1);
-        Users userone = userBean.findUser(email1);
-        Users usertwo = userBean.findUser(email2);
-        
-        if(userone == null ){
-            return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + email1).build();
-        }
-        if(usertwo == null ){
-            return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + email2).build();
-        }
-        
-        ArrayList<String> friends = relationshipBean.findCommonFriends(userone, usertwo);
-        if(friends.isEmpty()){
-           return Response.status(Response.Status.NO_CONTENT).entity("Given users have no common friends").build(); 
-        }
-        JsonArrayBuilder friendsBuilder = Json.createArrayBuilder();
-        friends.stream().forEach((p) -> {
-            friendsBuilder.add(p);
-         });
-        JsonObjectBuilder response = Json.createObjectBuilder();
-        response.add("success","true");
-        response.add("friends",friendsBuilder);
-        response.add("count",friends.size());
-        return(Response.ok(response.build()).build());
-        
-    }
-    
-    @POST
-    @Path("connect")
-    @Consumes("application/json")
-    @Produces(MediaType.APPLICATION_JSON)    
-    private Response addConnection(ArrayList<String> friends) {
-        
-        //String email1 = friends.getFriends().get(0);
-        //String email2 = friends.getFriends().get(1);
+    private Response getCommonFriends(ArrayList<String> friends){
         String email1 = friends.get(0);
         String email2 = friends.get(1);
         Users userone = userBean.findUser(email1);
@@ -119,15 +83,66 @@ public class RelationshipResource {
         if(usertwo == null ){
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + email2).build();
         }
-        Relationships relation = relationshipBean.findRelation(userone, usertwo);
-        if(relation != null){
-            return Response.status(Response.Status.CONFLICT).entity("Relationship exists").build();
+        
+        ArrayList<String> common_friends = relationshipBean.findCommonFriends(userone, usertwo);
+        if(common_friends.isEmpty()){
+           return Response.status(Response.Status.NO_CONTENT).entity("Given users have no common friends").build(); 
         }
-        relationshipBean.create(userone, usertwo,"friends");
+        JsonArrayBuilder friendsBuilder = Json.createArrayBuilder();
+        common_friends.stream().forEach((p) -> {
+            friendsBuilder.add(p);
+         });
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("success","true");
+        response.add("friends",friendsBuilder);
+        response.add("count",common_friends.size());
+        return(Response.ok(response.build()).build());
+        
+    }
+    
+    @POST
+    @Path("connect")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)    
+    private Response addConnection(ArrayList<String> friends) {
+        return modifyRelation(friends.get(0), friends.get(1), "friends");            
+    }
+    
+    @POST
+    @Path("subscibe")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    private Response subsribeToUpdates(String requestor, String target) {
+        return modifyRelation(requestor, target, "subscribed");         
+    }
+    
+    @POST
+    @Path("block")
+    @Consumes("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
+    private Response blockUsers(String requestor, String target) {
+        return modifyRelation(requestor, target, "blocked");         
+    }
+    
+    private Response modifyRelation(String email1, String email2, String status){
+        Users userone = userBean.findUser(email1);
+        Users usertwo = userBean.findUser(email2);
+        
+        if(userone == null ){
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + email1).build();
+        }
+        if(usertwo == null ){
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + email2).build();
+        }
+        Relationships relation = relationshipBean.findRelation(userone, usertwo);
+        if(relation != null && relation.getStatus().equals(status)){
+            return Response.status(Response.Status.CONFLICT).entity("User: "+ email1 +" and user: " + email2 +" already " + status).build();
+        }
+        relationshipBean.createRelation(userone, usertwo, status);
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add("success","true");
         return(Response.ok(response.build()).build());
-            
+        
     }
     
 }

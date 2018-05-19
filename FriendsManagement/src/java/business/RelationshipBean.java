@@ -25,7 +25,7 @@ public class RelationshipBean {
     
     @PersistenceContext private EntityManager em;
     
-    public Relationships create(Users userone, Users usertwo, String status){
+    public Relationships createRelation(Users userone, Users usertwo, String status){
         RelationshipsPK relationPK = new RelationshipsPK();
         relationPK.setUserone(userone.getEmail());
         relationPK.setUsertwo(usertwo.getEmail());
@@ -59,4 +59,5 @@ public class RelationshipBean {
        });
     return common_friends;
     }
+    
 }
