@@ -55,6 +55,11 @@ public class FriendsResource {
         return resource;
     }
     
+    /**
+     * To get all friends of the user if user with the email exists
+     * @param asyncResponse
+     * @param email 
+     */
     @POST
     @Path("friends")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -86,6 +91,11 @@ public class FriendsResource {
         return(Response.ok(response.build()).build());
     }
 
+    /**
+     * Gets common friends between given two users
+     * @param asyncResponse
+     * @param friendList 
+     */
     @POST
     @Path("common")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -127,6 +137,11 @@ public class FriendsResource {
         return(Response.ok(response.build()).build());
     }
 
+    /**
+     * Retrieves all the subscribers of the sender of the topic
+     * @param asyncResponse
+     * @param request 
+     */
     @POST
     @Path("retrieve")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -181,6 +196,11 @@ public class FriendsResource {
         return(Response.ok(response.build()).build());
     }
 
+    /**
+     * Adds given two users as friends
+     * @param asyncResponse
+     * @param friends 
+     */
     @POST
     @Path("connect")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -195,6 +215,11 @@ public class FriendsResource {
         return connectPeople(friends[0], friends[1], "friends");
     }
 
+    /**
+     * Blocks the target user for the requesting user
+     * @param asyncResponse
+     * @param request 
+     */
     @POST
     @Path("block")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -209,6 +234,11 @@ public class FriendsResource {
         return modifyRelation(requestor, target, "blocked");
     }
 
+    /**
+     * Makes the requesting user as the subscriber of the target user
+     * @param asyncResponse
+     * @param request 
+     */
     @POST
     @Path("subscribe")
     @Consumes(MediaType.APPLICATION_JSON)
