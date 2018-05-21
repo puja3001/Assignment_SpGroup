@@ -6,21 +6,17 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -32,91 +28,79 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Followings.findAll", query = "SELECT f FROM Followings f"),
-    @NamedQuery(name = "Followings.findByFUsername", query = "SELECT f FROM Followings f WHERE f.fusername = :username"),
-    @NamedQuery(name = "Followings.findByUsername", query = "SELECT f FROM Followings f WHERE f.username = :username"),
-    @NamedQuery(name = "Followings.findByUsers", query = "SELECT f FROM Followings f WHERE f.username = :username AND f.fusername = :fusername"),
-    @NamedQuery(name = "Followings.findByFollowingId", query = "SELECT f FROM Followings f WHERE f.followingId = :followingId"),
-    @NamedQuery(name = "Followings.findByDatecreated", query = "SELECT f FROM Followings f WHERE f.datecreated = :datecreated")})
+    @NamedQuery(name = "Followings.findByUsername", query = "SELECT f FROM Followings f WHERE f.followingsPK.username = :username"),
+    @NamedQuery(name = "Followings.findByFusername", query = "SELECT f FROM Followings f WHERE f.followingsPK.fusername = :fusername"),
+    @NamedQuery(name = "Followings.findByUsers", query = "SELECT f FROM Followings f WHERE f.followingsPK.username = :username AND f.followingsPK.fusername = :fusername"),
+    @NamedQuery(name = "Followings.findByFstatus", query = "SELECT f FROM Followings f WHERE f.fstatus = :fstatus")})
 public class Followings implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "following_id")
-    private Integer followingId;
+    @EmbeddedId
+    protected FollowingsPK followingsPK;
     @Basic(optional = false)
     @NotNull
+    @Size(min = 1, max = 11)
     @Column(name = "fstatus")
     private String fstatus;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "datecreated")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date datecreated;
-    @JoinColumn(name = "fusername", referencedColumnName = "email")
+    @JoinColumn(name = "fusername", referencedColumnName = "email", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Users fusername;
-    @JoinColumn(name = "username", referencedColumnName = "email")
+    private Users users;
+    @JoinColumn(name = "username", referencedColumnName = "email", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Users username;
+    private Users users1;
 
     public Followings() {
     }
 
-    public Followings(Integer followingId) {
-        this.followingId = followingId;
+    public Followings(FollowingsPK followingsPK) {
+        this.followingsPK = followingsPK;
     }
 
-    public Followings(Integer followingId, Date datecreated) {
-        this.followingId = followingId;
-        this.datecreated = datecreated;
-    }
-
-    public Integer getFollowingId() {
-        return followingId;
-    }
-
-    public void setFollowingId(Integer followingId) {
-        this.followingId = followingId;
-    }
-    
-    public void setFStatus(String fstatus){
+    public Followings(FollowingsPK followingsPK, String fstatus) {
+        this.followingsPK = followingsPK;
         this.fstatus = fstatus;
     }
-    
-    public String getFStatus(){
+
+    public Followings(String username, String fusername) {
+        this.followingsPK = new FollowingsPK(username, fusername);
+    }
+
+    public FollowingsPK getFollowingsPK() {
+        return followingsPK;
+    }
+
+    public void setFollowingsPK(FollowingsPK followingsPK) {
+        this.followingsPK = followingsPK;
+    }
+
+    public String getFstatus() {
         return fstatus;
     }
 
-    public Date getDatecreated() {
-        return datecreated;
+    public void setFstatus(String fstatus) {
+        this.fstatus = fstatus;
     }
 
-    public void setDatecreated(Date datecreated) {
-        this.datecreated = datecreated;
+    public Users getUsers() {
+        return users;
     }
 
-    public Users getFusername() {
-        return fusername;
+    public void setUsers(Users users) {
+        this.users = users;
     }
 
-    public void setFusername(Users fusername) {
-        this.fusername = fusername;
+    public Users getUsers1() {
+        return users1;
     }
 
-    public Users getUsername() {
-        return username;
-    }
-
-    public void setUsername(Users username) {
-        this.username = username;
+    public void setUsers1(Users users1) {
+        this.users1 = users1;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (followingId != null ? followingId.hashCode() : 0);
+        hash += (followingsPK != null ? followingsPK.hashCode() : 0);
         return hash;
     }
 
@@ -127,7 +111,7 @@ public class Followings implements Serializable {
             return false;
         }
         Followings other = (Followings) object;
-        if ((this.followingId == null && other.followingId != null) || (this.followingId != null && !this.followingId.equals(other.followingId))) {
+        if ((this.followingsPK == null && other.followingsPK != null) || (this.followingsPK != null && !this.followingsPK.equals(other.followingsPK))) {
             return false;
         }
         return true;
@@ -135,7 +119,7 @@ public class Followings implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Followings[ followingId=" + followingId + " ]";
+        return "model.Followings[ followingsPK=" + followingsPK + " ]";
     }
     
 }

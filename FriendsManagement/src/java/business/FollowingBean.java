@@ -7,12 +7,14 @@ package business;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import model.Followings;
+import model.FollowingsPK;
 import model.Users;
 
 /**
@@ -25,13 +27,13 @@ public class FollowingBean {
     @PersistenceContext private EntityManager em;
     
     public ArrayList<String> findFollowersOfUser(Users user){
-        TypedQuery<Followings> query = em.createNamedQuery("Followings.findByFUsername", Followings.class);
-        query.setParameter("username", user);
+        TypedQuery<Followings> query = em.createNamedQuery("Followings.findByFusername", Followings.class);
+        query.setParameter("fusername", user);
         List<Followings> followers = query.getResultList();
         ArrayList<String> subscribers = new ArrayList<>();
         followers.stream().forEach((follower) -> {
-            if(follower.getFStatus().equals("subscribed")){
-                subscribers.add(follower.getUsername().getEmail());  
+            if(follower.getFstatus().equals("subscribed")){
+                subscribers.add(follower.getUsers().getEmail());  
             }
        });
         return subscribers;
@@ -41,13 +43,18 @@ public class FollowingBean {
         em.merge(following);
     }
     
-    public void createFollowing(Users userone, Users usertwo, String status){
+    public Followings createFollowing(Users userone, Users usertwo, String status){
+        FollowingsPK followingPK = new FollowingsPK();
+        followingPK.setUsername(userone.getEmail());
+        followingPK.setFusername(usertwo.getEmail());
+        
         Followings following = new Followings();
-        following.setUsername(userone);
-        following.setFusername(usertwo);
-        following.setFStatus(status);
-        following.setDatecreated(new Date());
+        following.setFollowingsPK(followingPK);
+        following.setUsers(userone);
+        following.setUsers1(usertwo);
+        following.setFstatus(status);
         em.persist(following);
+        return em.merge(following);
     }
     
     public Followings findFollowing(Users userone, Users usertwo){

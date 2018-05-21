@@ -159,6 +159,7 @@ public class FriendsResource {
 
     private Response doRetrieveUsers(String sender, String text) {
         
+        Set<String> subscribers = new HashSet<>();
         JsonArrayBuilder subscribersBuilder = Json.createArrayBuilder();
         
         Users user = userBean.findUser(sender);
@@ -167,7 +168,7 @@ public class FriendsResource {
             String email = m.group();
 	    Users user_sub = userBean.findUser(email);
             if(user_sub != null){
-                subscribersBuilder.add(email);
+                subscribers.add(email);
             }
 	}
         
@@ -177,7 +178,6 @@ public class FriendsResource {
         ArrayList<String> followers = followingBean.findFollowersOfUser(user);
         ArrayList<String> relations = userBean.getAllUsers(user.getEmail());
       
-        Set<String> subscribers = new HashSet<>();
         followers.stream().forEach((p) -> {
             subscribers.add(p);
         });
@@ -272,10 +272,10 @@ public class FriendsResource {
         
         Followings following = followingBean.findFollowing(userone, usertwo);
         if(following != null){
-            if(following.getFStatus().equals(status)){
+            if(following.getFstatus().equals(status)){
              return Response.status(Response.Status.CONFLICT).entity("User: "+ email1 +" and user: " + email2 +" already " + status).build();   
             }else{
-                following.setFStatus(status);
+                following.setFstatus(status);
                 followingBean.updateFollowing(following);
                 JsonObjectBuilder response = Json.createObjectBuilder();
                 response.add("success","true");

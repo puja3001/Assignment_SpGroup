@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -69,9 +70,9 @@ public class Users implements Serializable {
     private Collection<Relationships> relationshipsCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "users1")
     private Collection<Relationships> relationshipsCollection1;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fusername")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "users")
     private Collection<Followings> followingsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "username")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "users1")
     private Collection<Followings> followingsCollection1;
 
     public Users() {
@@ -136,6 +137,7 @@ public class Users implements Serializable {
     }
 
     @XmlTransient
+    @JsonIgnore
     public Collection<Relationships> getRelationshipsCollection() {
         return relationshipsCollection;
     }
@@ -145,6 +147,7 @@ public class Users implements Serializable {
     }
 
     @XmlTransient
+    @JsonIgnore
     public Collection<Relationships> getRelationshipsCollection1() {
         return relationshipsCollection1;
     }
@@ -154,6 +157,7 @@ public class Users implements Serializable {
     }
 
     @XmlTransient
+    @JsonIgnore
     public Collection<Followings> getFollowingsCollection() {
         return followingsCollection;
     }
@@ -163,6 +167,7 @@ public class Users implements Serializable {
     }
 
     @XmlTransient
+    @JsonIgnore
     public Collection<Followings> getFollowingsCollection1() {
         return followingsCollection1;
     }
