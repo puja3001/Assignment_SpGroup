@@ -159,31 +159,28 @@ public class FriendsResource {
 
     private Response doRetrieveUsers(String sender, String text) {
         
-        Set<String> subscribers = new HashSet<>();
         JsonArrayBuilder subscribersBuilder = Json.createArrayBuilder();
         
+        Set<Users> subscribers_to_verify = new HashSet<>();
         Users user = userBean.findUser(sender);
 	Matcher m = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+").matcher(text);
 	while (m.find()) {
             String email = m.group();
 	    Users user_sub = userBean.findUser(email);
             if(user_sub != null){
-                subscribers.add(email);
+                subscribers_to_verify.add(user_sub);
             }
 	}
         
         if(user == null){
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + sender).build();
         }
-        ArrayList<String> followers = followingBean.findFollowersOfUser(user);
         ArrayList<String> relations = userBean.getAllUsers(user.getEmail());
-      
-        followers.stream().forEach((p) -> {
-            subscribers.add(p);
-        });
         relations.stream().forEach((p) -> {
-            subscribers.add(p);
+            subscribers_to_verify.add(userBean.findUser(p));
         }); 
+        
+        ArrayList<String> subscribers = followingBean.findSubscribers(user, subscribers_to_verify);
         
         if(subscribers.isEmpty()){
             return Response.status(Response.Status.NO_CONTENT).entity("Given user has no valid subsribers").build();

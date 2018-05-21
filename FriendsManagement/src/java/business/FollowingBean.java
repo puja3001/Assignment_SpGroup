@@ -5,10 +5,10 @@
  */
 package business;
 
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,17 +25,22 @@ import model.Users;
 public class FollowingBean {
     
     @PersistenceContext private EntityManager em;
-    
-    public ArrayList<String> findFollowersOfUser(Users user){
-        TypedQuery<Followings> query = em.createNamedQuery("Followings.findByFusername", Followings.class);
-        query.setParameter("fusername", user);
-        List<Followings> followers = query.getResultList();
+        
+    public ArrayList<String> findSubscribers(Users sender, Set<Users> friends){
         ArrayList<String> subscribers = new ArrayList<>();
-        followers.stream().forEach((follower) -> {
-            if(follower.getFstatus().equals("subscribed")){
-                subscribers.add(follower.getUsers().getEmail());  
-            }
-       });
+        friends.stream().forEach((friend) ->{
+            Followings following1 = findFollowing(friend,sender);
+            Followings following2 = findFollowing(sender,friend);
+            if(following1 != null && !following1.getFstatus().equals("blocked")){
+                if(following2 != null && !following2.getFstatus().equals("blocked")){
+                    subscribers.add(friend.getEmail());  
+                }else if(following2 == null){
+                    subscribers.add(friend.getEmail());    
+                }
+            }else if(following1 == null){
+                subscribers.add(friend.getEmail());   
+            }  
+        });
         return subscribers;
     }
     
@@ -58,10 +63,10 @@ public class FollowingBean {
     }
     
     public Followings findFollowing(Users userone, Users usertwo){
-        TypedQuery<Followings> query = em.createNamedQuery("Followings.findByUsers", Followings.class);
-        query.setParameter("username", userone);
-        query.setParameter("fusername", usertwo);
-        Followings following = query.getSingleResult();
+        FollowingsPK followingPK = new FollowingsPK();
+        followingPK.setUsername(userone.getEmail());
+        followingPK.setFusername(usertwo.getEmail());
+        Followings following = em.find(Followings.class, followingPK);
         return following;
     }
     

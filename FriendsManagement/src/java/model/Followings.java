@@ -30,7 +30,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Followings.findAll", query = "SELECT f FROM Followings f"),
     @NamedQuery(name = "Followings.findByUsername", query = "SELECT f FROM Followings f WHERE f.followingsPK.username = :username"),
     @NamedQuery(name = "Followings.findByFusername", query = "SELECT f FROM Followings f WHERE f.followingsPK.fusername = :fusername"),
-    @NamedQuery(name = "Followings.findByUsers", query = "SELECT f FROM Followings f WHERE f.followingsPK.username = :username AND f.followingsPK.fusername = :fusername"),
     @NamedQuery(name = "Followings.findByFstatus", query = "SELECT f FROM Followings f WHERE f.fstatus = :fstatus")})
 public class Followings implements Serializable {
 
