@@ -5,8 +5,11 @@
  */
 package rest;
 
+import json_request_models.JSONRequest_FriendList;
+import json_request_models.JSONRequest_request;
+import json_request_models.JSONRequest_subs;
+import json_request_models.JSONRequest_Email;
 import business.FollowingBean;
-import json_objects.*;
 import business.RelationshipBean;
 import business.UserBean;
 import java.util.ArrayList;

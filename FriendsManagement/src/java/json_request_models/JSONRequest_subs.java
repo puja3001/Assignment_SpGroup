@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package json_objects;
+package json_request_models;
 
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package json_objects;
+package json_request_models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -15,27 +16,25 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 
 @XmlRootElement
-public class JSONRequest_Email implements Serializable{
+public class JSONRequest_FriendList implements Serializable{
     
     @JsonProperty
-    String email;
-
-    public JSONRequest_Email(){
+    String[] friends = new String[2];
+    
+    public JSONRequest_FriendList(){
         
     }
     
-    public JSONRequest_Email(String email) {
-        this.email = email;
+    public JSONRequest_FriendList(String[] friends){
+        this.friends = friends;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setFriends(String[] friends) {
+        this.friends = friends;
     }
     
-    
+    public String[] getFriends(){
+        return friends;
+    }
     
 }
