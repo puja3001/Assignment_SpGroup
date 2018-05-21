@@ -12,6 +12,8 @@ import business.UserBean;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.enterprise.concurrent.ManagedScheduledExecutorService;
@@ -153,14 +155,19 @@ public class FriendsResource {
     }
 
     private Response doRetrieveUsers(String sender, String text) {
+        
+        JsonArrayBuilder subscribersBuilder = Json.createArrayBuilder();
+        
         Users user = userBean.findUser(sender);
+	Matcher m = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+").matcher(text);
+	while (m.find()) {
+            String email = m.group();
+	    Users user_sub = userBean.findUser(email);
+            if(user_sub != null){
+                subscribersBuilder.add(email);
+            }
+	}
         
-        /*String pattern  = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-        Pattern regex = Pattern.compile(pattern);
-        Matcher regexMatcher = regex.matcher(text);
-        String email_sub =  text.substring(regexMatcher.start(),regexMatcher.end());
-        
-        Users user_sub = userBean.findUser(email_sub);*/
         if(user == null){
             return Response.status(Response.Status.NOT_FOUND).entity("User not found for email:" + sender).build();
         }
@@ -168,7 +175,6 @@ public class FriendsResource {
         ArrayList<String> relations = userBean.getAllUsers(user.getEmail());
       
         Set<String> subscribers = new HashSet<>();
-        JsonArrayBuilder subscribersBuilder = Json.createArrayBuilder();
         followers.stream().forEach((p) -> {
             subscribers.add(p);
         });
@@ -183,11 +189,8 @@ public class FriendsResource {
         subscribers.stream().forEach((p) -> {
             subscribersBuilder.add(p);
         });
+        
         int count = subscribers.size();
-        /*if(user_sub != null){
-            subscribersBuilder.add(email_sub);
-            count += 1;
-        }*/
         
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add("success","true");
